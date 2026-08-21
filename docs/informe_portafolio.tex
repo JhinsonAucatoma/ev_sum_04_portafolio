@@ -238,4 +238,62 @@ if (!nodosCaidos.isEmpty()) {
     silenciosamente incompleta~\cite{nygard2018releaseit}. Lo que me llevo de esto, más allá de este proyecto puntual, es que en cualquier operación que dependa de múltiples nodos remotos
     debo preguntarme explícitamente ``¿qué debe devolver este endpoint si uno de los nodos no responde?'' \emph{antes} de escribir el código de integración, no después de que una prueba
     e caída lo revele por accidente.
+
+    % =====================================================
+% PARTE (b) — CONTRIBUCIÓN INDIVIDUAL AL PFC
+% =====================================================
+    \section{Contribución individual al PFC}
+
+    \noindent\textbf{Repositorio del PFC:} {\footnotesize\url{https://github.com/JoseLozanoMorales/PFC-AppsDistribuidas}}
+
+    \noindent\textbf{Captura del historial filtrado por autoría.} La Figura~\ref{fig:commits-github} muestra el historial de commits del repositorio filtrado por mi usuario (\texttt{JhinsonAucatoma}) con el rango ``All time'', obtenida desde la pestaña \emph{Commits} de GitHub. Se reprodujo con \texttt{git log --author="jaucatomac@uteq.edu.ec"} desde una clonación local, confirmando que el historial completo (no un clon parcial) y una única identidad de autor (\texttt{JhinsonAucatoma <jaucatomac@uteq.edu.ec>}, verificada con \texttt{git log --all --format="\%an <\%ae>" | sort -u}) sustentan esta tabla.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{../figuras/commits-github.png}
+        \caption{Historial de commits del repositorio del PFC filtrado por autoría (\texttt{JhinsonAucatoma}, ``All time'').}
+        \label{fig:commits-github}
+    \end{figure}
+
+    \noindent\textbf{Distribución temporal.} Los aportes no se concentran en un único día ni en las horas previas a una entrega: se distribuyen en siete fechas distintas a lo largo del periodo (25, 26, 27 y 29 de julio; 6, 17 y 18 de agosto de 2026), con trabajo sustantivo en cada una --- nuevos microservicios, manejo de errores, seguridad JWT, patrón outbox, circuit breaker/retry y la redacción de secciones del informe LaTeX del PFC.
+
+    \small
+    \setlength{\tabcolsep}{3.5pt}
+    \begin{longtable}{@{}>{\ttfamily\raggedright\arraybackslash}p{1.4cm} >{\raggedright\arraybackslash}p{1.5cm} >{\raggedright\arraybackslash}p{4.9cm} >{\raggedright\arraybackslash}p{6.7cm}@{}}
+        \caption{Aportes individuales verificados en el repositorio del PFC (filtrados por autoría, \texttt{git log --numstat}).}
+        \label{tab:commits-pfc} \\
+        \toprule
+        \normalfont Hash & \normalfont Fecha & \normalfont Mensaje & \normalfont Archivos afectados \\
+        \midrule
+        \endfirsthead
+        \toprule
+        \normalfont Hash & \normalfont Fecha & \normalfont Mensaje & \normalfont Archivos afectados \\
+        \midrule
+        \endhead
+        \bottomrule
+        \endfoot
+        1373c26 & 2026-08-18 & Merge remote-tracking branch 'origin/main' & (merge, sin cambios propios) \\
+        673bc4d & 2026-08-18 & ordenes-proveedores-service: 409 en rechazos de negocio sin causa DB & \normalfont ApiExceptionHandler.java, PgErrorMapper.java, OrdenCompraController.java y 4 más \\
+        359bf7c & 2026-08-18 & ordenes-proveedores-service: Circuit Breaker y retry en InventarioClient & \normalfont pom.xml, InventarioClient.java, application.properties \\
+        27c3c70 & 2026-08-17 & ordenes-proveedores-service: timeouts en InventarioClient & \normalfont InventarioClient.java, application.properties \\
+        bb486ff & 2026-08-17 & ordenes-proveedores-service: JWT y healthcheck & \normalfont Dockerfile, pom.xml, JwtAuthFilter.java y 2 más \\
+        2fc3dd1 & 2026-08-17 & ventas-service: JWT, healthcheck, timeouts, patrón outbox y circuit breaker & \normalfont 17 archivos: JwtAuthFilter.java, SecurityConfig.java, InventarioOutboxProcessor.java, FacturaOutboxRepository.java y 13 más \\
+        4512287 & 2026-08-06 & Merge pull request \#14 from JoseLozano\-Morales/\allowbreak feature/\allowbreak entrega-3 & (merge, sin cambios propios) \\
+        f8d8218 & 2026-07-29 & Quitar salto de página & \normalfont docs/entrega3/PFC3.tex \\
+        a383849 & 2026-07-29 & Conclusión del informe & \normalfont docs/entrega3/PFC3.tex \\
+        496ee8a & 2026-07-29 & Declaración de uso de Inteligencia Artificial & \normalfont docs/entrega3/PFC3.tex \\
+        e468360 & 2026-07-29 & fundamento teórico & \normalfont docs/entrega3/PFC3.tex \\
+        fbdbf60 & 2026-07-29 & Bibliografía mínima y 7 con DOI verificable & \normalfont docs/entrega3/referenciasPFC.bib \\
+        7acce5e & 2026-07-27 & ordenar línea del docker compose que conecta al microservicio de inventario & \normalfont docker-compose.yml \\
+        e7fa5b0 & 2026-07-27 & configuración para establecer la conexión con el microservicio de inventario-service para reducir stock tras la venta & \normalfont docker-compose.yml, InventarioClient.java, FacturaService.java, application.properties \\
+        0af9b00 & 2026-07-27 & agregación para devolver numero y total en la respuesta de POST /api/facturas ya que solo devuelve facturaId & \normalfont docker-compose.yml, FacturaController.java \\
+        0cc603d & 2026-07-26 & Adición del microservicio de ventas al docker-compose & \normalfont docker-compose.yml \\
+        126ea84 & 2026-07-26 & Adición del microservicio de Ventas que confirma la venta de un cliente & \normalfont 10 archivos: Dockerfile, VentasServiceApplication.java, ApiExceptionHandler.java y 7 más \\
+        0fd33c2 & 2026-07-25 & Adición de los archivos para el levantamiento del contenedor del microservicio de ordenes-proveedores & \normalfont docker-compose.yml, .dockerignore, Dockerfile, application.properties \\
+        092ee41 & 2026-07-25 & Merge remote-tracking branch 'origin/Matster\_Repositories' & (merge, sin cambios propios) \\
+        123d37a & 2026-07-25 & corrección del CallableStatement ya que no llamaba a los procedimientos, añadir los controler de Orden y Proveedor, el Repository de OrdenCompra y Proveedor y avance de conexión al microservicio de Inventario & \normalfont InventarioClient.java, OrdenCompraController.java, ProveedorController.java y 4 más \\
+        ea77642 & 2026-07-25 & arreglo del app Spring Boot, también se agregé para el manejo de errores y services de orden de compra/proveedor & \normalfont 9 archivos: OrdenesProveedores\-Service\-Application.java, ApiExceptionHandler.java, PgErrorMapper.java y 6 más \\
+        8b96eb8 & 2026-07-25 & Se agregaron el model y repository de órdenes de proveedores y la creación del servicio de ventas & \normalfont 9 archivos: .idea/misc.xml, pom.xml, DetalleOrdenCompra.java y 6 más \\
+    \end{longtable}
+    \normalsize
 \end{document}
