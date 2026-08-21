@@ -1,0 +1,95 @@
+\documentclass[11pt]{article}
+% ---------- Idioma y codificación ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+% ---------- Página A4 ----------
+\usepackage[a4paper,margin=2.5cm]{geometry}
+% ---------- Bibliografía IEEE (biblatex + biber) ----------
+\usepackage[backend=biber,style=ieee,sorting=none]{biblatex}
+\addbibresource{referencias.bib}
+% ---------- Figuras, tablas, código ----------
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{longtable}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=blue
+}
+% Resaltado de sintaxis para SQL (Evidencia 1)
+\lstdefinestyle{sqlstyle}{
+    language=SQL,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray},
+    stringstyle=\color{teal},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    showstringspaces=false
+}
+\lstset{style=sqlstyle}
+% Resaltado de sintaxis para Java (Evidencia 3)
+\lstdefinestyle{javastyle}{
+    language=Java,
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray},
+    stringstyle=\color{teal},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    breaklines=true,
+    frame=single,
+    showstringspaces=false
+}
+\title{}
+\date{}
+\begin{document}
+% =====================================================
+% CARÁTULA
+% =====================================================
+    \begin{center}
+        {\large\bfseries Universidad Técnica Estatal de Quevedo}\\
+        Facultad de Ciencias de la Computación\\
+        Ingeniería de Software --- Aplicaciones Distribuidas (ISR-701)\\[1em]
+        {\Large\bfseries EV-AUT-03 --- Portafolio de Evidencias Individuales}\\[1.5em]
+    \end{center}
+    \noindent
+    \begin{tabular}{@{}ll}
+        \textbf{Estudiante:} & Jhinson Stalyn Aucatoma Celorio \\
+        \textbf{Curso:} & 7mo Software ``A'' \\
+        \textbf{Equipo PFC:} & AGLS \\
+        \textbf{Código del instrumento:} & EV-AUT-03 \\
+    \end{tabular}
+
+    \medskip
+    \noindent\textbf{Integrantes PFC:}
+    \begin{itemize}[noitemsep,topsep=2pt]
+          \item Jhinson Stalyn Aucatoma Celorio
+          \item Jeremy Ruperto Gaibor Rodríguez
+          \item Andy Paul Sánchez Pilaloa
+          \item José Alejandro Lozano Morales
+    \end{itemize}
+
+    \bigskip
+    \noindent\textbf{URL del repositorio del portafolio:}\\
+    \url{https://github.com/JhinsonAucatoma/ev_sum_04_portafolio}
+
+    \medskip
+    \noindent\textbf{URL del repositorio del PFC:}\\
+    \url{https://github.com/JoseLozanoMorales/PFC-AppsDistribuidas}
+
+    \vspace{2em}
+    \hrule
+    \vspace{2em}
+\end{document}
