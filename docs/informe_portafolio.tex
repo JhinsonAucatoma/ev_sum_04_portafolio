@@ -131,4 +131,66 @@ CREATE TABLE pedidos_fragmento (
     (completitud, reconstrucción, disjunción), sino evaluando si el criterio de corte refleja cómo se va a consultar el dato en la práctica; dos esquemas
     igualmente correctos pueden tener rendimientos muy distintos según ese ajuste.
 
+% ---------------------------------------------------------------
+% EVIDENCIA 2 — ANÁLISIS TÉCNICO
+% ---------------------------------------------------------------
+    \subsection{Evidencia 2 --- Análisis técnico: verificación cuantitativa de consistencia}
+
+    \noindent\textbf{Unidad del curso:} Unidad 3. Bases de Datos Distribuidas (Tema 2: Diseño y Fragmentación de Bases de Datos Distribuidas).
+
+    \noindent\textbf{Artefacto:}
+    \begin{itemize}[noitemsep,topsep=2pt]
+  \item Archivo: \texttt{sql/07\_verificacion.sql}
+  \item Commit: \texttt{1640a76} (hash completo: \texttt{1640a76d196694c66c4961684013548ba3780fe6})
+  \item Repositorio: \url{https://github.com/JhinsonAucatoma/practica-fragmentacion}
+    \end{itemize}
+
+    \begin{lstlisting}[caption={Consultas de \texttt{07\_verificacion.sql} usadas para medir completitud, reconstrucción y disjunción.}, label={lst:ev2-verificacion}]
+-- 1) COMPLETITUD
+SELECT COUNT(*) AS filas_globales FROM pedidos_global;
+SELECT COUNT(*) AS filas_centralizadas FROM pedidos;
+
+-- 2) RECONSTRUCCION
+SELECT sede, SUM(monto) AS total_global
+FROM pedidos_global GROUP BY sede ORDER BY sede;
+SELECT sede, SUM(monto) AS total_centralizado
+FROM pedidos GROUP BY sede ORDER BY sede;
+
+-- 3) DISJUNCION
+SELECT pedido_id, COUNT(*) AS veces
+FROM pedidos_global
+GROUP BY pedido_id
+HAVING COUNT(*) > 1;
+    \end{lstlisting}
+
+    \begin{table}[H]
+        \centering
+        \caption{Resultados obtenidos al ejecutar las consultas de verificación sobre el conjunto de prueba (6 clientes, 8 pedidos repartidos en 3 sedes).}
+        \label{tab:ev2-resultados}
+        \small
+        \begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.6cm} >{\raggedright\arraybackslash}p{4.0cm} >{\raggedright\arraybackslash}p{5.6cm} >{\raggedright\arraybackslash}p{1.8cm}@{}}
+            \toprule
+            Condición & Métrica medida & Valor obtenido & ¿Coincide? \\
+            \midrule
+            Completitud & filas\_globales vs.\ filas\_centralizadas & 8 vs.\ 8 & Sí \\
+            Reconstrucción & Suma de \texttt{monto} por sede (global vs.\ centralizado) & Babahoyo 4.25, Campus 4.25, Ventanas 2.25 (ambas consultas) & Sí \\
+            Disjunción & filas con \texttt{pedido\_id} repetido & 0 filas & Sí (0 esperado) \\
+            \bottomrule
+        \end{tabular}
+    \end{table}
+
+    \noindent\textbf{Protocolo de medición.}
+    Tras cargar el conjunto de prueba (6 clientes y 8 pedidos, repartidos de forma desigual entre Campus, Babahoyo y Ventanas) y construir la vista \texttt{pedidos\_global} mediante \texttt{postgres\_fdw} (unión de los tres fragmentos horizontales), ejecuté por \texttt{psql} dentro del contenedor \texttt{pg-campus} las tres consultas del Listado~\ref{lst:ev2-verificacion} y comparé cada resultado contra la tabla \texttt{pedidos} de ese mismo nodo, que conservé sin fragmentar como referencia central (Tabla~\ref{tab:ev2-resultados}).
+
+    \noindent\textbf{Interpretación.}
+    Los tres resultados confirman, con datos medidos por mí, las tres condiciones de corrección que exige toda fragmentación correcta según
+    la literatura del curso: completitud (ningún dato se perdió: 8 filas en ambas consultas), reconstrucción (\texttt{UNION ALL} reproduce
+    exactamente los mismos totales por sede que la tabla centralizada) y disjunción (ningún \texttt{pedido\_id} aparece en más de un fragmento)~\cite{ozsu2020principles}.
+    Sin embargo, esta verificación tiene una limitación que no debo presentar como concluyente: se ejecutó sobre un conjunto sintético de solo 8 filas, en un único punto
+    en el tiempo y sin escritura concurrente entre nodos. No comprueba, por ejemplo, qué pasaría si dos sedes insertaran pedidos simultáneamente mientras otro cliente
+    consulta \texttt{pedidos\_global} un escenario donde los compromisos entre disponibilidad, latencia y consistencia que describe el modelo PACELC sí serían relevantes y
+    podrían mostrar inconsistencias transitorias que esta prueba estática, de un solo escritor, no puede detectar~\cite{abadi2012pacelc}. Lo que aprendí es que verificar
+    completitud/reconstrucción/disjunción sobre datos estáticos prueba la corrección del \emph{esquema} de fragmentación, pero no sustituye una prueba de consistencia bajo
+    concurrencia real.
+
 \end{document}
