@@ -193,4 +193,49 @@ HAVING COUNT(*) > 1;
     completitud/reconstrucción/disjunción sobre datos estáticos prueba la corrección del \emph{esquema} de fragmentación, pero no sustituye una prueba de consistencia bajo
     concurrencia real.
 
+% ---------------------------------------------------------------
+% EVIDENCIA 3 — REFLEXIÓN DOCUMENTADA
+% ---------------------------------------------------------------
+    \subsection{Evidencia 3 --- Reflexión documentada: de un fallo total a una degradación controlada}
+
+    \noindent\textbf{Unidad del curso:} Unidad 2. Aplicaciones Distribuidas: fragmentación horizontal, transparencia de ubicación y autonomía local (caso Banco del Austro).
+
+    \noindent\textbf{Artefacto:}
+    \begin{itemize}[noitemsep,topsep=2pt]
+  \item Archivo: \texttt{service/ConsultaDistribuidaService.java}
+  \item Método: \texttt{listarTodosLosClientes}
+  \item Commit: \texttt{e8e57ee} (hash completo: \texttt{e8e57eed14cefa94762c28db9d5884c0b2bbcaf2})
+    \end{itemize}
+    \noindent Repositorio: {\footnotesize\url{https://github.com/JhinsonAucatoma/TA_IND_02_Analisis_Consistencia_Replicacion_BDD}}
+
+    \noindent\textbf{El hecho concreto.}
+    Al detener el contenedor \texttt{banco-quito} para probar la tolerancia a fallos, la versión original de \texttt{listarTodosLosClientes()} (que simplemente concatenaba las consultas de los dos \texttt{JdbcTemplate} (\texttt{jdbcCuenca} y \texttt{jdbcQuito}) sin ningún manejo de errores) respondió con un error 500 Internal Server Error, incluso para los clientes de Cuenca, cuyo nodo seguía activo. La versión corregida quedó así:
+
+    \begin{lstlisting}[style=javastyle, caption={Fragmento de \texttt{listarTodosLosClientes} con manejo de fallos por nodo.}, label={lst:ev3-fallback}]
+try { union.addAll(jdbcCuenca.queryForList(sql)); }
+catch (Exception e) { nodosCaidos.add("CUENCA"); }
+
+try { union.addAll(jdbcQuito.queryForList(sql)); }
+catch (Exception e) { nodosCaidos.add("QUITO"); }
+
+Map<String, Object> resultado = new HashMap<>();
+resultado.put("clientes", union);
+resultado.put("totalDisponibles", union.size());
+if (!nodosCaidos.isEmpty()) {
+    resultado.put("advertencia",
+        "Los siguientes nodos no respondieron y se excluyeron de la union: " + nodosCaidos);
+    resultado.put("nodosCaidos", nodosCaidos);
+}
+    \end{lstlisting}
+
+    \noindent\textbf{Reflexión.}
+    El supuesto que resultó falso fue asumir, de forma implícita, que todos los nodos consultados en una operación distribuida iban a responder siempre. En el código original
+    ese supuesto ni siquiera estaba escrito (simplemente no había ningún \texttt{try/catch}) lo cual es precisamente lo peligroso: un supuesto no declarado es más difícil de
+    cuestionar que uno explícito. La caída de un único nodo (Quito) bastó para tumbar una respuesta que, en un 60\,\% de los casos (los clientes de Cuenca), sí se podía entregar.
+    Al envolver cada consulta por nodo en su propio \texttt{try/catch} (Listado~\ref{lst:ev3-fallback}), cambié la decisión de diseño: en lugar de exigir que \emph{todos} los nodos
+    respondan para dar cualquier respuesta, el sistema ahora entrega lo que sí tiene disponible junto con una advertencia explícita de qué nodos faltaron. Es una versión artesanal
+    del patrón \emph{Circuit Breaker} que describe Nygard para sistemas en producción: preferir una degradación visible y controlada antes que una falla total o, peor, una respuesta
+    silenciosamente incompleta~\cite{nygard2018releaseit}. Lo que me llevo de esto, más allá de este proyecto puntual, es que en cualquier operación que dependa de múltiples nodos remotos
+    debo preguntarme explícitamente ``¿qué debe devolver este endpoint si uno de los nodos no responde?'' \emph{antes} de escribir el código de integración, no después de que una prueba
+    e caída lo revele por accidente.
 \end{document}
