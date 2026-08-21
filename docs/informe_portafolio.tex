@@ -92,4 +92,43 @@
     \vspace{2em}
     \hrule
     \vspace{2em}
+
+    \section{Evidencias de aprendizaje del periodo}
+
+% ---------------------------------------------------------------
+% EVIDENCIA 1 — CÓDIGO PROPIO
+% ---------------------------------------------------------------
+    \subsection{Evidencia 1 --- Código propio: criterio de fragmentación horizontal}
+
+    \noindent\textbf{Unidad del curso:} Unidad 3. Bases de Datos Distribuidas (Tema 2: Diseño y Fragmentación de Bases de Datos Distribuidas).
+
+    \noindent\textbf{Artefacto:}
+    \begin{itemize}[noitemsep,topsep=2pt]
+  \item Archivo: \texttt{sql/03\_fragmentacion\_horizontal.sql}
+  \item Commit: \texttt{1640a76} (hash completo: \texttt{1640a76d196694c66c4961684013548ba3780fe6})
+  \item Repositorio: \url{https://github.com/JhinsonAucatoma/practica-fragmentacion}
+    \end{itemize}
+
+    \begin{lstlisting}[caption={Fragmento de \texttt{03\_fragmentacion\_horizontal.sql}: esquema del fragmento horizontal de \texttt{pedidos}.}, label={lst:ev1-horizontal}]
+CREATE TABLE pedidos_fragmento (
+    pedido_id INTEGER PRIMARY KEY,
+    cliente_id INTEGER NOT NULL,
+    producto_id INTEGER NOT NULL,
+    fecha DATE NOT NULL,
+    monto NUMERIC(8,2) NOT NULL,
+    sede VARCHAR(20) NOT NULL
+);
+    \end{lstlisting}
+
+    \noindent\textbf{Explicación del aprendizaje.}
+    Al diseñar el esquema de fragmentación horizontal de la tabla \texttt{pedidos} (Listado~\ref{lst:ev1-horizontal})
+    evalué dos criterios de corte posibles: por \texttt{sede} o por \texttt{producto\_id}. Descarté \texttt{producto\_id}
+    porque las consultas típicas del escenario (una cafetería con tres sedes) son del tipo ``ventas de esta sede'', no ``ventas de este producto'';
+    fragmentar por producto no habría acercado los datos a quien los consulta. Entonces opté por \texttt{sede} porque ese criterio hace que cada
+    fragmento resida físicamente cerca de los usuarios que más lo consultan, lo que en \emph{Principles of Distributed Database Systems} se plantea
+    como uno de los objetivos centrales del diseño de fragmentación: minimizar el costo de las consultas más frecuentes acercando los datos a su patrón
+    de acceso~\cite{ozsu2020principles}. Lo que aprendí es que una decisión de fragmentación no se valida solo verificando que sea correcta en abstracto
+    (completitud, reconstrucción, disjunción), sino evaluando si el criterio de corte refleja cómo se va a consultar el dato en la práctica; dos esquemas
+    igualmente correctos pueden tener rendimientos muy distintos según ese ajuste.
+
 \end{document}
